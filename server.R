@@ -58,8 +58,8 @@ server <- function(input, output, session) {
           output$rd_reports <- renderMenu({menuSubItem('Reports', tabName = 'tab_reports')})
         
         output$login_link <- renderUI({
-          if(user_info()$Fullname == 'Ryan Kinzer') {
-            actionLink('greeting', label = paste0('Hello, Jerkface McGee!'), style = 'color: white;')
+          if(user_info()$Fullname == 'Tyler Stright') {
+            actionLink('greeting', label = paste0('Hello, bad skier!'), style = 'color: white;')
           } else {
             actionLink('greeting', label = paste0('Hello, ', user_info()$Fullname, "!"), style = 'color: white;')
             }
