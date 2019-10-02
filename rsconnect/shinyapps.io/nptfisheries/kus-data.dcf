@@ -5,8 +5,8 @@ account: nptfisheries
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 519105
-bundleId: 2455610
+bundleId: 2459814
 url: https://nptfisheries.shinyapps.io/kus-data/
-when: 1569854452.4559
+when: 1569953456.38245
 asMultiple: FALSE
 asStatic: FALSE

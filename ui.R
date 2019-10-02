@@ -53,13 +53,13 @@ body <- dashboardBody(
                        box(status = 'info', width = 12, 
                            img(src='Steelhead.jpg', width = '100%', height='auto')),
                        box(status = 'info', width = 12, 
-                           img(src='jcweir.jpg', width = '100%', height='auto'))
+                           img(src='jcweir.png', width = '100%', height='auto'))
                 ),
                 column(7, 
                 box(status = 'info', width = 12, 
                   img(src='jcrst.jpg', width = '100%', height = 'auto')),
                 box(status = 'info', width = 12, 
-                    img(src='chinook.jpg', width = '100%', height = 'auto'))
+                    img(src='chinook.png', width = '100%', height = 'auto'))
                 )
               )
             ),
