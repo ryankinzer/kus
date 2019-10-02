@@ -33,9 +33,8 @@ cdmsLogin(username, api_key) #login.
 
 ```{r Data Processing: Juvenile Abundance/Survival/Equivalents, include=FALSE}
 ASE_df <- summariseRST()[[2]] %>%
-  filter(MigratoryYear == 2017) %>%
-  select(POP_NAME, SpeciesRun, StreamName, LocationLabel, SampleType, Origin, BroodYear, MigratoryYear, Year, Lifestage, Abundance, Ab_SE, Ab_L95, Ab_U95, 
-         ReleaseType, ReleaseGroup, AdClipped, SurvivalTo, Survival, Surv_SE, Surv_L95, Surv_U95, Equivalents)
+  filter(MigratoryYear == 2017)
+
 
 # Natural A/S/E
 nat_ASE <- ASE_df %>%
