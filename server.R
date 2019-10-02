@@ -1,53 +1,30 @@
 # Kus Server ----
 server <- function(input, output, session) {
-  # Hide & show Tabs based on login status ----
-  observe({
+
+  # Create Login Modal Functionality ----
+  output$login_link <- renderUI({
     if(is.null(login_status)) {
-      hideElement(selector = "ul li:eq(10)", anim= TRUE) # Number is the "list item" (tags$li and menuItems) to remove(x-1)), # change as tabs are included in sidebar
-    } else {
-      if(status_code(login_status) != 200) {
-        hideElement(selector = "ul li:eq(10)", anim= TRUE) # change as tabs are included in sidebar
-      } else {
-        showElement(selector = "ul li:eq(10)", anim= TRUE) # change as tabs are included in sidebar
-        }
-    }
-  })
-  
-  # Create Login / Logout Functionality ----
-    # Login
-  output$login_logout <- renderUI({
-    if(is.null(login_status)) {
-      actionLink('login_link', '[Sign-In]', icon = icon('sign-in-alt'),
-                 style = 'color: white;')
-    } else {
-      if(status_code(login_status) == 200) {
-        actionLink('logout_link', label = paste0(user_info()$Fullname, ' [Sign Out]'),
-                   icon = icon('sign-out-alt'),
-                   style = 'color: white;')
-      } 
-    }
+      actionLink('login_link', '[Sign-In]', icon = icon('sign-in-alt'), style = 'color: white;')
+    } 
   })  
-    # Logout
-  observeEvent(input$logout_link, {
-    login_status <<- NULL
-    hideElement(selector = "ul li:eq(10)", anim= TRUE) # change as tabs are included in sidebar
-    output$login_logout <- renderUI({actionLink('login_link', '[Sign In]', icon = icon('sign-in-alt'), style = 'color: white;')}) 
-  })
   
-  # Login Modal Process ----
+  # User information
   makeReactiveBinding("login_status")
-    # User information
+
   user_info <- reactive({
     httr::content(login_status, "parsed", encoding = "UTF-8")[[3]]
   })
+  
     # Modal
+  modal_widgits <- list(
+    textInput('username','Username', width = "100%"), 
+    passwordInput('password', 'Password', width = "100%"), 
+    tags$head(tags$script(HTML(jscode))),
+    actionButton('login', 'Login'))
+  
   observeEvent(input$login_link,
                showModal(modalDialog(
-                 textInput('username','Username', width = "100%"), 
-                 passwordInput('password', 'Password', width = "100%"), 
-                 tags$head(tags$script(HTML(jscode))),
-                 actionButton('login', 'Login'),
-                 size = "m",
+                 modal_widgits,
                  easyClose = TRUE,
                  title = "DFRM Fisheries Data Access",
                  footer = HTML("<em> Restricted data access is intended for DFRM Staff only. </em>")
@@ -58,11 +35,7 @@ server <- function(input, output, session) {
     if(input$username == '' | input$password == '')
     {
       showModal(modalDialog(
-        textInput('username','Username', width = "100%"),
-        passwordInput('password', 'Password', width = "100%"),
-        tags$head(tags$script(HTML(jscode))),
-        actionButton('login', 'Login'),
-        size = "m",
+        modal_widgits,
         easyClose = TRUE,
         title = "Username or password fields are blank.",
         footer = "Please fill in your username and password correctly."
@@ -72,27 +45,28 @@ server <- function(input, output, session) {
       
       if(status_code(login_status) != 200) {
         showModal(modalDialog(
-          textInput('username','Username', width = "100%"),
-          passwordInput('password', 'Password', width = "100%"),
-          tags$head(tags$script(HTML(jscode))),
-          actionButton('login', 'Login'),
-          size = "m",
+          modal_widgits,
           easyClose = TRUE,
           title = "Invalid Username or Password",
           footer = "I'm sorry you are having trouble. Try re-checking the post-it note on your computer screen. :)"
         ))
       } else {
         removeModal()
-        showElement(selector = "ul li:eq(10)") # change as tabs are included in sidebar
-        output$login_logout <- renderUI({
-          actionLink('logout_link', label = paste(user_info()$Fullname, ' [Sign Out]'),
-                    icon = icon('sign-out-alt'), style = 'color: white;')
+        # Show restricted Data:
+          output$rd_cdms <- renderMenu({menuSubItem('CDMS Datasets', tabName = 'tab_cdms')})
+          output$rd_customquery <- renderMenu({menuSubItem('Custom Queries', tabName = 'tab_custom')})
+          output$rd_reports <- renderMenu({menuSubItem('Reports', tabName = 'tab_reports')})
+        
+        output$login_link <- renderUI({
+          if(user_info()$Fullname == 'Ryan Kinzer') {
+            actionLink('greeting', label = paste0('Hello, Jerkface McGee!'), style = 'color: white;')
+          } else {
+            actionLink('greeting', label = paste0('Hello, ', user_info()$Fullname, "!"), style = 'color: white;')
+            }
         })
       }
     }
   })
-  
-
   
   # Spawning Ground Surveys Summaries Tab ----
 
@@ -193,23 +167,7 @@ server <- function(input, output, session) {
       shiny::validate(
         need(nrow(pf_tmp) > 0, message = '*No data for the current selection.')
       )
-      # LINES
-      # pfem_plotly <- plot_ly(data = pf_tmp,
-      #                      x = ~Year,
-      #                      y = ~PercentFemales,
-      #                      name = ~POP_NAME,
-      #                      type = 'scatter',
-      #                      mode = 'lines+markers',
-      #                      color = ~POP_NAME,
-      #                      colors = viridis_pal(option="D")(length(unique(pf_tmp$POP_NAME)))
-      #                      ) %>%
-      #   layout(title = list(text = '<b>Percent Females</b>',
-      #                       font = plotly_font),
-      #          xaxis= list(title = 'Year'),
-      #          yaxis= list(title= 'Percent Females',
-      #                      tickformat = "%",
-      #          range = c(0,1.05)),
-      #          legend = list(orientation = 'h', xanchor = 'center', x = 0.5, y = -0.15))
+      
       # BOXPLOT
       pfem_plotly <- plot_ly(data = pf_tmp,
                              x = ~POP_NAME,
@@ -241,21 +199,7 @@ server <- function(input, output, session) {
       shiny::validate(
         need(nrow(phos_tmp) > 0, message = '*No data for the current selection.')
       )
-      # LINES
-      # phos_plotly <- plot_ly(data = phos_tmp,
-      #                      x = ~Year,
-      #                      y = ~pHOS,
-      #                      name = ~POP_NAME,
-      #                      type = 'scatter',
-      #                      mode = 'lines+markers',
-      #                      color = ~POP_NAME,
-      #                      colors = viridis_pal(option="D")(length(unique(phos_tmp$POP_NAME)))
-      #                      ) %>%
-      #   layout(title = list(text= '<b>Percent Hatchery Origin Spawners</b>',
-      #                       font = plotly_font),
-      #          yaxis= list(tickformat = "%",
-      #                      range = c(0,1.05)),
-      #          legend = list(orientation = 'h', xanchor = 'center', x = 0.5, y = -0.15))
+
       # BOXPLOT
       phos_plotly <- plot_ly(data = phos_tmp,
                              x = ~POP_NAME,
@@ -286,22 +230,7 @@ server <- function(input, output, session) {
       shiny::validate(
         need(nrow(psm_tmp) > 0, message = '*No data for the current selection.')
       )
-      # LINES
-      # psm_plotly <- plot_ly(data = psm_tmp,
-      #                      x = ~Year,
-      #                      y = ~PrespawnMortality,
-      #                      name = ~POP_NAME,
-      #                      type = 'scatter',
-      #                      mode = 'lines+markers',
-      #                      color = ~POP_NAME,
-      #                      colors = viridis_pal(option="D")(length(unique(psm_tmp$POP_NAME)))
-      #                      ) %>%
-      #   layout(title = list(text= '<b>Percent Prespawn Mortality</b>',
-      #                       font = plotly_font),
-      #          yaxis = list(title= 'Prespawn Mortalities',
-      #                       tickformat = "%",
-      #                       range = c(0,1.05)),
-      #          legend = list(orientation = 'h', xanchor = 'center', x = 0.5, y = -0.15))
+      
       # BOXPLOT
       psm_plotly <- plot_ly(data = psm_tmp,
                              x = ~POP_NAME,
@@ -371,7 +300,7 @@ server <- function(input, output, session) {
     disable(id = 'juv_dataload')
     shinyjs::show(id='juv_spinner')
     
-    juv_summary_df <<- summariseRST()[[1]]  # snag summary dataframe
+    juv_summary_df <<- summariseRST()[[1]]  # summary dataframe
     
     juv_pop_list_full <<- juv_summary_df %>%
       group_by(SpeciesRun, POP_NAME) %>%

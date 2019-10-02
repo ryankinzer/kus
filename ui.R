@@ -10,13 +10,14 @@ header <- dashboardHeader(title = div(id = "kustitle", 'Kus', style='float:right
                                   class = 'dropdown'),
                           tags$li(tags$a("PITtrackR Web App", href = "https://nptfisheries.shinyapps.io/PITtrackR/", target = '_blank', class='navlinks'),
                                   class = 'dropdown'),
-                          # Login/Logout Link
-                          tags$li(tags$a(uiOutput('login_logout')), class = 'dropdown', style= 'position:absolute; left:42px')
+                          # Login Link
+                          tags$li(tags$a(uiOutput('login_link')), class = 'dropdown', style= 'position:absolute; left:42px')
                           )
 
 # Dashboard Sidebar ----
 sidebar <- dashboardSidebar(
     useShinyjs(), # Activate ShinyJS
+    # width = "100%",
     sidebarMenu(
       menuItem('Kus Home', tabName = 'tab_home', icon = icon("home")),
       menuItem('Data Summaries', tabName = 'tab_productivity', icon = icon("chart-area"), startExpanded = TRUE,
@@ -26,20 +27,16 @@ sidebar <- dashboardSidebar(
                menuSubItem('Juvenile Monitoring', tabName = 'tab_juv'),
                menuSubItem('Age Sampling', tabName = 'tab_age')
                ),
-      menuItem('Restricted Data Access', tabName = 'tab_rawdata', icon = icon('table'), startExpanded = TRUE,
-               menuSubItem('CDMS Datasets', tabName = 'tab_cdms'),
-               menuSubItem('Custom Queries', tabName = 'tab_custom'),
-               menuSubItem('Reports', tabName = 'tab_reports')
-               ),
-      br(), br(), br(), br(), br()#, # spacers
-      # img(src = 'DFRM.png', title = NULL, draggable = FALSE, width = '100%', style = 'padding-left:10px;') # DFRM Logo
+      menuItem('Restricted Data', tabName = 'tab_rawdata', icon = icon('table'), startExpanded = TRUE,
+        menuItemOutput('rd_cdms'),
+        menuItemOutput('rd_customquery'),
+        menuItemOutput('rd_reports'))
     )
   )
 
 # Dashboard Body ----
 body <- dashboardBody(
   includeCSS('./www/styles.css'),
-  # img(src='kusbg.jpg', class = 'kusbg', draggable = FALSE), # background image
     tabItems(
   # KusHome Tab ----
       tabItem(tabName = 'tab_home',
@@ -235,11 +232,6 @@ body <- dashboardBody(
                                 selected = 'Juvenile Summary MY17'),
                     helpText(HTML('<em>*Reports are generated from raw data at the time of request. As such, loading may take several minutes. Clicking the download button multiple times may result in multiple downloads.</em>')),
                     downloadButton('reports', label = 'Download Report')
-                    # fluidRow(
-                    #   column(2, downloadButton('reports', label = 'Download Report')),
-                    #   # column(1, hidden(div(id='sgs_spinner', img(src='Fish.gif', style = 'height:30px; '))))
-                    #   column(1, div(id='sgs_spinner', img(src='Fish.gif', style = 'height:30px; ')))
-                    #         )
                     )
               ))
   
