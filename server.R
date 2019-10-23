@@ -58,8 +58,8 @@ server <- function(input, output, session) {
           output$rd_reports <- renderMenu({menuSubItem('Reports', tabName = 'tab_reports')})
         
         output$login_link <- renderUI({
-          if(user_info()$Fullname == 'Tyler Stright') {
-            actionLink('greeting', label = paste0('Hello, bad skier!'), style = 'color: white;')
+          if(user_info()$Fullname == 'Ryan Kinzer') {
+            actionLink('greeting', label = paste0('Hello, Debby Downer'), style = 'color: white;')
           } else {
             actionLink('greeting', label = paste0('Hello, ', user_info()$Fullname, "!"), style = 'color: white;')
             }
@@ -745,7 +745,8 @@ server <- function(input, output, session) {
     
   })
   
-  # Restricted Data Access Tab ----
+  # Restricted Data Access  ===================================================
+  # CDMS DATASETS ----
   # Create ***REACTIVE VALUES*** (RV$) for dynamic data and Inputs ----
   RV <- reactiveValues(query_data = NULL)
   
@@ -813,16 +814,26 @@ server <- function(input, output, session) {
                Year = MigratoryYear) %>% 
         select(-contains('Id'))
       } else {
-        raw_dat <<- getDatasetView(datastoreID = input$datasets, projectID = NULL, waterbodyID = NULL, locationID = NULL, cdms_host = cdms_host)
-        # Prepare Age Data (i.e. Collection Date)
-        raw_dat <<- raw_dat %>%
-          mutate(SpeciesRun = paste(Run, Species),
-                 CollectionDate = as_date(CollectionDate),
-                 Year = year(CollectionDate)) %>% 
-          select(-contains('Id'))
+        if(input$datasets == 92) {
+          raw_dat <<- getDatasetView(datastoreID = input$datasets, projectID = NULL, waterbodyID = NULL, locationID = NULL, cdms_host = cdms_host)
+          # Prepare Sturgeon Data (i.e. Collection Date)
+          raw_dat <<- raw_dat %>%
+            mutate(Year = SurveyYear) %>% 
+            select(-contains('Id'), -SpeciesRun)
+          
+          raw_dat$SpeciesRun <<- "White Sturgeon"
+        } else {
+            raw_dat <<- getDatasetView(datastoreID = input$datasets, projectID = NULL, waterbodyID = NULL, locationID = NULL, cdms_host = cdms_host)
+            # Prepare Age Data (i.e. Collection Date)
+            raw_dat <<- raw_dat %>%
+              mutate(SpeciesRun = paste(Run, Species),
+                     CollectionDate = as_date(CollectionDate),
+                     Year = year(CollectionDate)) %>% 
+              select(-contains('Id'))
+          }
       }
 
-    }
+    }  # 94/95/96
   
       RV$query_data <<- raw_dat  # Populate our dynamic dataframe.
       
