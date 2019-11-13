@@ -787,7 +787,7 @@ server <- function(input, output, session) {
     dataset <<- datasets %>%
       select(DatastoreId, DatastoreName) %>%
       distinct(DatastoreId, .keep_all = TRUE) %>%
-      filter(!DatastoreId %in% c(81:84, 87:91)) %>% 
+      filter(!DatastoreId %in% c(81:84, 87:91, 94:96)) %>%  # filter out unwanted datastore records. Currently includes 94:96 -Arrays.
       arrange(DatastoreName)
     
     datasets_ls <- as.list(dataset[,1])
