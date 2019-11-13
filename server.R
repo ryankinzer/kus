@@ -58,11 +58,7 @@ server <- function(input, output, session) {
           output$rd_reports <- renderMenu({menuSubItem('Reports', tabName = 'tab_reports')})
         
         output$login_link <- renderUI({
-          if(user_info()$Fullname == 'Ryan Kinzer') {
-            actionLink('greeting', label = paste0('Hello, Debby Downer'), style = 'color: white;')
-          } else {
             actionLink('greeting', label = paste0('Hello, ', user_info()$Fullname, "!"), style = 'color: white;')
-            }
         })
       }
     }
@@ -81,8 +77,9 @@ server <- function(input, output, session) {
   output$sgs_data_button <- renderUI({
     tagList(
       fluidRow(
-        column(9, actionButton(inputId= 'sgs_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
-        column(1, hidden(div(id='sgs_spinner', img(src='Fish.gif', style = 'height:30px; '))))
+        column(12, actionButton(inputId= 'sgs_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(9, actionButton(inputId= 'sgs_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(1, hidden(div(id='sgs_spinner', img(src='Fish.gif', style = 'height:30px; '))))
       ),
       helpText(HTML('<em> *Initial data load may take several minutes.</em>'))
     )
@@ -295,8 +292,9 @@ server <- function(input, output, session) {
   output$juv_data_button <- renderUI({
     tagList(
       fluidRow(
-        column(9, actionButton(inputId= 'juv_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
-        column(1, hidden(div(id='juv_spinner', img(src='Fish.gif', style = 'height:30px; float:left;'))))
+        column(12, actionButton(inputId= 'juv_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(9, actionButton(inputId= 'juv_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(1, hidden(div(id='juv_spinner', img(src='Fish.gif', style = 'height:30px; float:left;'))))
       ),
       helpText(HTML('<em> *Initial data load may take several minutes.</em>'))
     )
@@ -495,8 +493,9 @@ server <- function(input, output, session) {
   output$age_data_button <- renderUI({
     tagList(
       fluidRow(
-        column(9, actionButton(inputId= 'age_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
-        column(1, hidden(div(id='age_spinner', img(src='Fish.gif', style = 'height:30px; float:left;'))))
+        column(12, actionButton(inputId= 'age_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(9, actionButton(inputId= 'age_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(1, hidden(div(id='age_spinner', img(src='Fish.gif', style = 'height:30px; float:left;'))))
       ),
       helpText(HTML('<em> *Initial data load may take several minutes.</em>'))
     )

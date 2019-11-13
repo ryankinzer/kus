@@ -34,7 +34,7 @@ sidebar <- dashboardSidebar(
 
       br(), br(), br(), br(), br(), br(), br(), 
       div(class = 'busy',
-          img(src="FISH_new.gif", height= 'auto', width = '100%') # BUSY SPINNER
+          img(src="kus_spinner.gif", height= 'auto', width = '100%') # BUSY SPINNER
           )
     )
   )
@@ -75,6 +75,7 @@ body <- dashboardBody(
               img(src='carcass.png', width = '100%', height='auto') 
                 ))
           ),
+          hr(),
           fluidRow(
             box(width = 12, plotlyOutput('p_redds'))
           ),
@@ -117,6 +118,7 @@ body <- dashboardBody(
                 img(src='lostine_rst.jpg', width = '100%', height='auto') 
             ))
           ),
+          hr(),
           fluidRow(
             box(width = 12, plotlyOutput('j_abundance'))
                   ),
@@ -164,8 +166,9 @@ body <- dashboardBody(
               box(width = 12, 
               fluidRow(column(6, uiOutput("raw_dataset_menu"),
                               fluidRow(
-                                column(8, offset = 2, actionButton("raw_submit", label = "Load Selected Dataset", icon = icon('file-import'), width = '100%')),
-                                column(2, hidden(div(id='datasets_spinner',img(src='Fish.gif', style = 'height:30px'))))
+                                column(8, offset = 2, actionButton("raw_submit", label = "Load Selected Dataset", icon = icon('hourglass-start'), width = '100%')),
+                                # column(8, offset = 2, actionButton("raw_submit", label = "Load Selected Dataset", icon = icon('file-import'), width = '100%')),
+                                # column(2, hidden(div(id='datasets_spinner',img(src='Fish.gif', style = 'height:30px'))))
                                       ),
                               br(),
                               selectInput(inputId = 'q_fields', label = 'Choose Fields in Desired Order:', choices = NULL, selectize = TRUE, multiple = TRUE),

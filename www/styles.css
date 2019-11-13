@@ -4,19 +4,14 @@ p = creates a TAG
 #ID = creates an ID
 */
 
-
+/*
 #sgs_spinner {height:30px;}
-
 #juv_spinner {height:30px;}
-
 #age_spinner {height:30px;}
-
 #datasets_spinner {height:30px;}
-
 #query_spinner {height:30px;}
-
 #reports_spinner {height:30px;}
-
+*/
 
 
 /* .box-info {
@@ -63,7 +58,6 @@ background-color: rgb(0,0,0);
 /* header */
 .skin-blue .main-header {
   position:fixed;
-  z-value:-1 !important;
   width:100%;
   background-color: rgb(0,0,0);
 }
@@ -86,6 +80,7 @@ background-color: rgb(0,0,0);
 .content {
   padding-top:60px;
   height:100vh;
+  overflow:auto;
 }
 .content-wrapper, .right-side {
 background-color: rgb(100,100,100);
