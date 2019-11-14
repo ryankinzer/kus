@@ -17,7 +17,7 @@ header <- dashboardHeader(title = div(id = "kustitle", 'Kus', style='float:right
 # Dashboard Sidebar ----
 sidebar <- dashboardSidebar(
     useShinyjs(), # Activate ShinyJS
-    # width = "100%",
+    tags$script(src='javascript.js'), # include Javascript file
     sidebarMenu(
       menuItem('Kus Home', tabName = 'tab_home', icon = icon("home")),
       menuItem('Data Summaries', tabName = 'tab_productivity', icon = icon("chart-area"), startExpanded = TRUE,
@@ -30,7 +30,12 @@ sidebar <- dashboardSidebar(
       menuItem('Restricted Data', tabName = 'tab_rawdata', icon = icon('table'), startExpanded = TRUE,
         menuItemOutput('rd_cdms'),
         menuItemOutput('rd_customquery'),
-        menuItemOutput('rd_reports'))
+        menuItemOutput('rd_reports')),
+
+      br(), br(), br(), br(), br(), br(), br(), 
+      div(class = 'busy',
+          img(src="kus_spinner.gif", height= 'auto', width = '100%') # BUSY SPINNER
+          )
     )
   )
 
@@ -41,22 +46,18 @@ body <- dashboardBody(
   # KusHome Tab ----
       tabItem(tabName = 'tab_home',
               fluidRow(
-                column(5,
-                box(status = 'info', width=12, background = 'aqua', # ?validStatuses ?validColors
-                            p('The Kus web application is intended to provide near real-time data summaries and
+                column(8, offset = 2,
+                       box(status = 'info', width=12, background = 'aqua', # ?validStatuses ?validColors
+                           p('The Kus web application is intended to provide near real-time data summaries and
                               visualizations to Nez Perce Tribal members and general public. This tool supports Department 
                               of Fisheries Resources Management staff and Snake Basin fisheries management decisions.')
-                            , style = 'color:black; font-size:1.23vw;'),
-                       box(status = 'info', width = 12, 
-                           img(src='Steelhead.jpg', width = '100%', height='auto')),
-                       box(status = 'info', width = 12, 
-                           img(src='jcweir.png', width = '100%', height='auto'))
-                ),
-                column(7, 
-                box(status = 'info', width = 12, 
-                  img(src='jcrst.jpg', width = '100%', height = 'auto')),
-                box(status = 'info', width = 12, 
-                    img(src='chinook.png', width = '100%', height = 'auto'))
+                           , style = 'color:black; font-size:1.23vw;'))),
+              fluidRow(
+                column(12, 
+                       box(status = 'info', width = 12, height = '800px', 
+                           fluidPage(
+                             htmlOutput('map'))
+                           )
                 )
               )
             ),
@@ -74,6 +75,7 @@ body <- dashboardBody(
               img(src='carcass.png', width = '100%', height='auto') 
                 ))
           ),
+          hr(),
           fluidRow(
             box(width = 12, plotlyOutput('p_redds'))
           ),
@@ -116,6 +118,7 @@ body <- dashboardBody(
                 img(src='lostine_rst.jpg', width = '100%', height='auto') 
             ))
           ),
+          hr(),
           fluidRow(
             box(width = 12, plotlyOutput('j_abundance'))
                   ),
@@ -163,12 +166,13 @@ body <- dashboardBody(
               box(width = 12, 
               fluidRow(column(6, uiOutput("raw_dataset_menu"),
                               fluidRow(
-                                column(8, offset = 2, actionButton("raw_submit", label = "Load Data", icon = icon('hourglass-start'), width = '100%')),
-                                column(2, hidden(div(id='datasets_spinner',img(src='Fish.gif', style = 'height:30px'))))
+                                column(8, offset = 2, actionButton("raw_submit", label = "Load Selected Dataset", icon = icon('hourglass-start'), width = '100%')),
+                                # column(8, offset = 2, actionButton("raw_submit", label = "Load Selected Dataset", icon = icon('file-import'), width = '100%')),
+                                # column(2, hidden(div(id='datasets_spinner',img(src='Fish.gif', style = 'height:30px'))))
                                       ),
                               br(),
                               selectInput(inputId = 'q_fields', label = 'Choose Fields in Desired Order:', choices = NULL, selectize = TRUE, multiple = TRUE),
-                              sliderInput(inputId= 'q_year', label= '*Choose Years:', min = 0, max = 100, value=  c(0,100), sep= '', step = 1),
+                              sliderInput(inputId= 'q_year', label= '*Choose Years:', min = 0, max = 100, value=  c(0,100), sep= '', step = 1, ticks = FALSE),
                               helpText(HTML('<em>* Year is "Spawn Year" for adult datasets and "Migratory Year" for juvenile datasets.</em>'), style = 'text-align:center;')
                               ),
                        column(6, 

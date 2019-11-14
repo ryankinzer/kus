@@ -1,11 +1,11 @@
 # Load Packages ---- 
 library(shiny)
 library(shinydashboard)
-# library(shinycssloaders)
 library(tidyverse)
 library(httr)
 library(jsonlite)
 library(lubridate)
+library(leaflet)
 library(plotly)
 library(shinyjs)
 library(viridis)
@@ -26,6 +26,7 @@ source('./R/cdms_api_keys.R')
 
 keys <- cdmsKeys()
 cdms_host <- keys[1]
+# cdms_host <- 'http://localhost:80/'  # use this to access local/DEV SQL server.
 username <- keys[2]
 api_key <- keys[3]
 

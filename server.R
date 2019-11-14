@@ -4,7 +4,7 @@ server <- function(input, output, session) {
   # Create Login Modal Functionality ----
   output$login_link <- renderUI({
     if(is.null(login_status)) {
-      actionLink('login_link', '[Sign-In]', icon = icon('sign-in-alt'), style = 'color: white;')
+      actionLink('login_link', '[Sign-In]', style = 'color: white;') #icon = icon('sign-in-alt')
     } 
   })  
   
@@ -58,15 +58,18 @@ server <- function(input, output, session) {
           output$rd_reports <- renderMenu({menuSubItem('Reports', tabName = 'tab_reports')})
         
         output$login_link <- renderUI({
-          if(user_info()$Fullname == 'Tyler Stright') {
-            actionLink('greeting', label = paste0('Hello, bad skier!'), style = 'color: white;')
-          } else {
             actionLink('greeting', label = paste0('Hello, ', user_info()$Fullname, "!"), style = 'color: white;')
-            }
         })
       }
     }
   })
+  
+  
+  # Home Tab / Leaflet ----
+  getPage<-function() {
+    return(includeHTML("./www/kus_map.html"))
+  }
+  output$map<-renderUI({getPage()})
   
   # Spawning Ground Surveys Summaries Tab ----
 
@@ -74,8 +77,9 @@ server <- function(input, output, session) {
   output$sgs_data_button <- renderUI({
     tagList(
       fluidRow(
-        column(9, actionButton(inputId= 'sgs_dataload', label = 'Load Data', icon = icon('hourglass-start'), width = '100%')),
-        column(1, hidden(div(id='sgs_spinner', img(src='Fish.gif', style = 'height:30px; '))))
+        column(12, actionButton(inputId= 'sgs_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(9, actionButton(inputId= 'sgs_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(1, hidden(div(id='sgs_spinner', img(src='Fish.gif', style = 'height:30px; '))))
       ),
       helpText(HTML('<em> *Initial data load may take several minutes.</em>'))
     )
@@ -288,8 +292,9 @@ server <- function(input, output, session) {
   output$juv_data_button <- renderUI({
     tagList(
       fluidRow(
-        column(9, actionButton(inputId= 'juv_dataload', label = 'Load Data', icon = icon('hourglass-start'), width = '100%')),
-        column(1, hidden(div(id='juv_spinner', img(src='Fish.gif', style = 'height:30px; float:left;'))))
+        column(12, actionButton(inputId= 'juv_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(9, actionButton(inputId= 'juv_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(1, hidden(div(id='juv_spinner', img(src='Fish.gif', style = 'height:30px; float:left;'))))
       ),
       helpText(HTML('<em> *Initial data load may take several minutes.</em>'))
     )
@@ -488,8 +493,9 @@ server <- function(input, output, session) {
   output$age_data_button <- renderUI({
     tagList(
       fluidRow(
-        column(9, actionButton(inputId= 'age_dataload', label = 'Load Data', icon = icon('hourglass-start'), width = '100%')),
-        column(1, hidden(div(id='age_spinner', img(src='Fish.gif', style = 'height:30px; float:left;'))))
+        column(12, actionButton(inputId= 'age_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(9, actionButton(inputId= 'age_dataload', label = 'Click to Load Data', icon = icon('hourglass-start'), width = '100%')),
+        # column(1, hidden(div(id='age_spinner', img(src='Fish.gif', style = 'height:30px; float:left;'))))
       ),
       helpText(HTML('<em> *Initial data load may take several minutes.</em>'))
     )
@@ -745,7 +751,8 @@ server <- function(input, output, session) {
     
   })
   
-  # Restricted Data Access Tab ----
+  # Restricted Data Access  ===================================================
+  # CDMS DATASETS ----
   # Create ***REACTIVE VALUES*** (RV$) for dynamic data and Inputs ----
   RV <- reactiveValues(query_data = NULL)
   
@@ -780,7 +787,7 @@ server <- function(input, output, session) {
     dataset <<- datasets %>%
       select(DatastoreId, DatastoreName) %>%
       distinct(DatastoreId, .keep_all = TRUE) %>%
-      filter(!DatastoreId %in% c(81:84, 87:91)) %>% 
+      filter(!DatastoreId %in% c(81:84, 87:91, 94:96)) %>%  # filter out unwanted datastore records. Currently includes 94:96 -Arrays.
       arrange(DatastoreName)
     
     datasets_ls <- as.list(dataset[,1])
@@ -796,35 +803,52 @@ server <- function(input, output, session) {
     disable(id = 'datasets')
     shinyjs::show(id='datasets_spinner')
 
+    # raw_dat <<- getDatasetView(datastoreID = input$datasets, projectID = NULL, waterbodyID = NULL, locationID = NULL, cdms_host = cdms_host)
     if(input$datasets %in% c(78, 79)) { # =c("SGS Redd Data", "SGS Carcass Data")
-      raw_dat <<- getDatasetView(datastoreID = input$datasets, projectID = NULL, waterbodyID = NULL, locationID = NULL, cdms_host = cdms_host) 
+      raw_dat <<- getDatasetView(datastoreID = input$datasets, projectID = NULL, waterbodyID = NULL, locationID = NULL, cdms_host = cdms_host)
       # Prepare Adult Data (i.e. Survey Date)
       raw_dat <<- raw_dat %>%
         mutate(SpeciesRun = paste(Run, Species),
                SurveyDate = as_date(SurveyDate),
-               Year = year(SurveyDate)) %>% 
-        select(-contains('Id'))
+               Year = year(SurveyDate))
     } else {
       if(input$datasets %in% c(85, 86)) { # = c('NPT RST Abundance Estimates', 'NPT Juvenile Survival Estimates')
         raw_dat <<- getDatasetView(datastoreID = input$datasets, projectID = NULL, waterbodyID = NULL, locationID = NULL, cdms_host = cdms_host)
       # Prepare Juvenile Data (i.e. Migratory Year)
       raw_dat <<- raw_dat %>%
         mutate(SpeciesRun = paste(Run, Species),
-               Year = MigratoryYear) %>% 
-        select(-contains('Id'))
+               Year = MigratoryYear)
       } else {
-        raw_dat <<- getDatasetView(datastoreID = input$datasets, projectID = NULL, waterbodyID = NULL, locationID = NULL, cdms_host = cdms_host)
-        # Prepare Age Data (i.e. Collection Date)
-        raw_dat <<- raw_dat %>%
-          mutate(SpeciesRun = paste(Run, Species),
-                 CollectionDate = as_date(CollectionDate),
-                 Year = year(CollectionDate)) %>% 
-          select(-contains('Id'))
+        if(input$datasets == 92) {
+          raw_dat <<- getDatasetView(datastoreID = input$datasets, projectID = NULL, waterbodyID = NULL, locationID = NULL, cdms_host = cdms_host)
+          # Prepare Sturgeon Data
+          raw_dat <<- raw_dat %>%
+            mutate(Year = SurveyYear) %>%
+            select(-SpeciesRun)
+
+          raw_dat$SpeciesRun <<- "White Sturgeon"
+        } else {
+          if(input$datasets %in% c(93, 94, 95)) {
+            raw_dat <<- getDatasetView(datastoreID = input$datasets, projectID = NULL, waterbodyID = NULL, locationID = NULL, cdms_host = cdms_host)
+            # Prepare ARRAYS Data
+            raw_dat <<- raw_dat %>%
+              mutate(SpeciesRun = paste(Run, Species),
+                     Year = SpawnYear)
+
+          } else {
+            raw_dat <<- getDatasetView(datastoreID = input$datasets, projectID = NULL, waterbodyID = NULL, locationID = NULL, cdms_host = cdms_host)
+            # Prepare Age Data (i.e. Collection Date)
+            raw_dat <<- raw_dat %>%
+              mutate(SpeciesRun = paste(Run, Species),
+                     CollectionDate = as_date(CollectionDate),
+                     Year = year(CollectionDate))
+            }
+          }
       }
 
     }
   
-      RV$query_data <<- raw_dat  # Populate our dynamic dataframe.
+      RV$query_data <<- raw_dat  # Populate our dynamic dataframe (Reactive Value).
       
       # Update our Inputs
       updateSelectInput(session, inputId= 'q_species', label= 'Choose Species:', choices= sort(unique(RV$query_data$SpeciesRun)),
@@ -943,7 +967,8 @@ server <- function(input, output, session) {
 
     if(is.null(input$q_fields)) {
       cdms_table_data <<- RV$query_data %>%
-        filter(Year %in% c(min(input$q_year): max(input$q_year)))
+        filter(Year %in% c(min(input$q_year): max(input$q_year))) %>%
+        select(-Year, -ActivityQAComments, -QAStatusName, -contains('Id'))
       
     } else {
       cdms_table_data <<- RV$query_data %>% 
