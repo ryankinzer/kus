@@ -67,7 +67,7 @@ server <- function(input, output, session) {
   
   # Home Tab / Leaflet ----
   getPage<-function() {
-    return(includeHTML("kus_map.html"))
+    return(includeHTML("./www/kus_map.html"))
   }
   output$map<-renderUI({getPage()})
   
